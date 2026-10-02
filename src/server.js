@@ -7,16 +7,38 @@ const PORT = 3000;
 app.use(express.json());
 
 app.post("/usuarios", async (req, res) => {
-    const {nome, idade} = req.body;
+    try {
+        const { nome, idade } = req.body;
 
-    const usuario = await prisma.usuario.create({
-        data: {
-            nome,
-            idade: Number(idade)
+        const usuario = await prisma.usuarios.create({
+            data: {
+                nome,
+                idade: Number(idade)
+            }
+        });
+
+        res.json(usuario);
+
+    } catch (erro) {
+        console.error(erro);
+        res.status(400).json({ erro: "Erro ao criar usuario" })
+    }
+});
+
+app.get("/usuarios", async (req, res) => {
+    const usuarios = await prisma.usuarios.findMany();
+
+    res.json(usuarios)
+});
+
+app.get("/usuarios", async (req, res) => {
+    const { id } = await prisma.usuarios.findUnique();
+
+    const usuario = await prisma.usuarios.findUnique({
+        where: {
+            id: Number(req.params.id);
         }
     });
-
-    res.json(usuario);
 });
 
 app.listen(PORT, () => {
